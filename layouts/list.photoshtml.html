@@ -1,5 +1,4 @@
 {{ define "main" }}
-	<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 	<ul class="masonry">
 	{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
 	{{- $list := $category.Pages -}}
@@ -24,4 +23,5 @@
 	{{- end -}}
 	{{ end }}
 	</ul>
+	<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js" defer="defer"></script>
 {{ end }}
