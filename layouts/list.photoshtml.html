@@ -13,7 +13,7 @@
 	  
 		{{- if .Scratch.Get "include_photo" -}}
 		{{- if .Params.photos -}}
-		<div class="grid-item">
+		<div class="grid" data-masonry='{"itemSelector": ".grid-item", "columnWidth": ".grid-sizer", "percentPosition": true, "gutter": 10 }'>
 			<a href="{{ .Permalink }}">
 				{{ range first 1 .Params.photos }}
 					<img src="{{ . }}" loading="lazy" />
