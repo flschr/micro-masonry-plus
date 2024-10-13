@@ -5,25 +5,25 @@ ul.masonry * {
 }
 
 ul.masonry {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -5px;
-    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columns by default */
+    gap: 10px; /* Adjust the space between items */
     list-style-type: none;
+    padding: 10px;
 }
 
 ul.masonry li {
-    width: calc(33.33% - 10px); /* 3 columns by default */
-    margin: 5px;
+    display: block;
 }
 
 ul.masonry img {
+    width: 100%;
     display: block;
 }
 
 /* Media query for screen widths of 1000px or less */
 @media screen and (max-width: 1000px) {
-    ul.masonry li {
-        width: calc(50% - 10px); /* 2 columns */
+    ul.masonry {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns */
     }
 }
