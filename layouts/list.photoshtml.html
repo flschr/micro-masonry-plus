@@ -1,6 +1,4 @@
 {{ define "main" }}
-	<div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
-		<div class="grid-sizer"></div>
 		{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
 		{{- $list := $category.Pages -}}
 		{{- $len := (len $list) -}}
@@ -13,14 +11,17 @@
 	  
 		{{- if .Scratch.Get "include_photo" -}}
 		{{- if .Params.photos -}}
-		<div class="grid-item">
+		<div class="grid" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 200 }'>
+			<div class="grid-sizer"></div>
+			<div class="grid-item">
 			<a href="{{ .Permalink }}">
 				{{ range first 1 .Params.photos }}
 					<img src="{{ . }}" loading="lazy" />
 				{{ end }}
 			</a>
 		</div>
+		</div>
 		{{- end -}}
 		{{- end -}}
-	</div>
+
 {{ end }}
