@@ -13,7 +13,6 @@ ul.masonry {
 }
 
 ul.masonry li {
-    margin-bottom: 10px; /* Optional margin */
     width: calc(33.33%); /* 3 columns */
 }
 
