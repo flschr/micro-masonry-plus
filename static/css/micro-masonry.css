@@ -5,15 +5,13 @@ ul.masonry * {
 }
 
 ul.masonry {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columns by default */
-    gap: 10px; /* Adjust the space between items */
-    list-style-type: none;
+    display: block; /* Default block for Masonry.js */
     padding: 10px;
+    list-style-type: none;
 }
 
 ul.masonry li {
-    display: block;
+    margin-bottom: 10px; /* Optional margin */
 }
 
 ul.masonry img {
@@ -21,9 +19,9 @@ ul.masonry img {
     display: block;
 }
 
-/* Media query for screen widths of 1000px or less */
+/* Responsive design for different screen sizes */
 @media screen and (max-width: 1000px) {
-    ul.masonry {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    ul.masonry li {
+        width: calc(50% - 20px); /* 2 columns */
     }
 }

@@ -1,20 +1,9 @@
 window.onload = function() {
-    masonryLayout();
-    window.addEventListener('resize', masonryLayout);
-};
-
-function masonryLayout() {
-    const masonry = document.querySelector('.masonry');
-    const items = masonry.querySelectorAll('li');
-    const columns = getComputedStyle(masonry).getPropertyValue('--columns') || 3;
-
-    // Set the number of columns based on screen size
-    let columnHeights = Array(parseInt(columns)).fill(0);
-
-    items.forEach(item => {
-        let minColIndex = columnHeights.indexOf(Math.min(...columnHeights));
-        item.style.gridColumnStart = minColIndex + 1;
-        item.style.gridRowStart = columnHeights[minColIndex] + 1;
-        columnHeights[minColIndex] += item.offsetHeight;
+    // Initialize Masonry after the window loads
+    var masonry = new Masonry('.masonry', {
+        itemSelector: 'li',   // The elements Masonry will position
+        columnWidth: '.masonry li', // Use the width of the items for column size
+        percentPosition: true, // Use percentages for responsive layout
+        gutter: 10             // Space between items
     });
-}
+};
