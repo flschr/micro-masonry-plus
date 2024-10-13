@@ -1,13 +1,15 @@
-* {
+ul.masonry * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
 ul.masonry {
-    display: block; /* Default block for Masonry.js */
+    display: block;
     padding: 10px;
+    margin: 0;
     list-style-type: none;
+    width: 100%;
 }
 
 ul.masonry li {
