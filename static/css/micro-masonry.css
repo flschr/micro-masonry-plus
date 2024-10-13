@@ -8,6 +8,8 @@ ul.masonry {
     display: block; /* Default block for Masonry.js */
     padding: 10px;
     list-style-type: none;
+    max-width: 64rem;
+    margin: 3rem auto;
 }
 
 ul.masonry li {
