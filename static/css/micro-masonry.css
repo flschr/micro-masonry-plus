@@ -18,10 +18,7 @@ ul.masonry li {
 }
 
 ul.masonry img {
-    width: 100%;
-    height: 100%;
     display: block;
-    object-fit: cover;
 }
 
 /* Media query for screen widths of 1000px or less */
