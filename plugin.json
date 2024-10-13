@@ -4,6 +4,7 @@
   "description": "A Micro.blog plug-in to easily add a masonry style layout to your photos page.",
   "includes": [
 		"/css/micro-masonry.css",
+    "/js/masonry.pkgd.min.js",
 		"/js/micro-masonry.js"
 	]
 }

@@ -1,9 +1,12 @@
-window.onload = function() {
-    // Initialize Masonry after the window loads
-    var masonry = new Masonry('.masonry', {
-        itemSelector: 'li',   // The elements Masonry will position
-        columnWidth: '.masonry li', // Use the width of the items for column size
-        percentPosition: true, // Use percentages for responsive layout
-        gutter: 10             // Space between items
-    });
-};
+var elem = document.querySelector('.grid');
+var msnry = new Masonry( elem, {
+  // options
+  itemSelector: '.grid-item',
+  columnWidth: 300
+});
+
+// element argument can be a selector string
+//   for an individual element
+var msnry = new Masonry( '.grid', {
+  // options
+});
