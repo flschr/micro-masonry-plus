@@ -1,27 +1,27 @@
 {{ define "main" }}
+	{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
+	{{- $list := $category.Pages -}}
+	{{- $len := (len $list) -}}
+	{{ range $index, $value := $list }}
+	{{- .Scratch.Set "include_photo" true -}}
+
+	{{- if and .Site.Params.photos_only_microblog (ne .Title "") -}}
+		{{- .Scratch.Set "include_photo" false -}}
+	{{- end -}}
+
+	{{- if .Scratch.Get "include_photo" -}}
+	{{- if .Params.photos -}}
 	<div class="grid" data-masonry='{"itemSelector": ".grid-item", "columnWidth": ".grid-sizer", "percentPosition": true, "gutter": 10 }'>
 		<div class="grid-sizer"></div>
-		{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
-		{{- $list := $category.Pages -}}
-		{{- $len := (len $list) -}}
-		{{ range $index, $value := $list }}
-		{{- .Scratch.Set "include_photo" true -}}
-
-		{{- if and .Site.Params.photos_only_microblog (ne .Title "") -}}
-			{{- .Scratch.Set "include_photo" false -}}
-		{{- end -}}
-	  
-		{{- if .Scratch.Get "include_photo" -}}
-		{{- if .Params.photos -}}
 		<div class="grid-item">
 			<a href="{{ .Permalink }}">
 				{{ range first 1 .Params.photos }}
-					<img src="{{ . }}" loading="lazy" />
+				<img src="{{ . }}" loading="lazy" />
 				{{ end }}
 			</a>
 		</div>
-		{{- end -}}
-		{{- end -}}
-		{{ end }}
 	</div>
+	{{- end -}}
+	{{- end -}}
+	{{- end -}}
 {{ end }}
