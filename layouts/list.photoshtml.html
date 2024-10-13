@@ -11,12 +11,12 @@
 
 	{{- if .Scratch.Get "include_photo" -}}
 	{{- if .Params.photos -}}
-	<div class="grid" data-masonry='{"itemSelector": ".grid-item", "columnWidth": ".grid-sizer", "percentPosition": true, "gutter": 10 }'>
+	<div class="grid" data-masonry='{"itemSelector": ".grid-item", "columnWidth": ".grid-sizer", "percentPosition": true, "gutter": 0 }'>
 		<div class="grid-sizer"></div>
 		<div class="grid-item">
 			<a href="{{ .Permalink }}">
 				{{ range first 1 .Params.photos }}
-				<img src="{{ . }}" loading="lazy" />
+				<img src="{{ . }}" />
 				{{ end }}
 			</a>
 		</div>
