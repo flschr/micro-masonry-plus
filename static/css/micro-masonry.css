@@ -9,7 +9,7 @@ ul.masonry {
     padding: 10px;
     margin: 0;
     list-style-type: none;
-    width: 100%;
+    width: calc(100% + 10px);
 }
 
 ul.masonry li {
