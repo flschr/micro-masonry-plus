@@ -9,22 +9,23 @@ ul.masonry {
     padding: 0;
     margin: 0;
     list-style-type: none;
-    width: calc(100% + 10px);
+    width: calc(100%);
 }
 
 ul.masonry li {
     margin-bottom: 10px; /* Optional margin */
-    width: calc(33.334% - 10px); /* 3 columns */
+    width: calc(33.33%); /* 3 columns */
 }
 
 ul.masonry img {
     width: 100%;
     display: block;
+    border: solid 5px transparent;
 }
 
 /* Responsive design for different screen sizes */
 @media screen and (max-width: 1000px) {
     ul.masonry li {
-        width: calc(50% - 10px); /* 2 columns */
+        width: calc(50%); /* 2 columns */
     }
 }
