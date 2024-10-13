@@ -7,7 +7,7 @@ ul.masonry * {
 ul.masonry {
     display: block;
     padding: 0;
-    margin: 0 -5px;
+    margin: 0;
     list-style-type: none;
     width: 100%;
 }
@@ -22,7 +22,7 @@ ul.masonry img {
     width: 100%;
     height: auto;
     display: block;
-    border: solid 5px transparent;
+    border: solid 3px transparent;
     margin: 0;
     padding: 0;
 }
