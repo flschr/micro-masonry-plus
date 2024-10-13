@@ -14,6 +14,7 @@ ul.masonry {
 
 ul.masonry li {
     width: calc(33.33%); /* 3 columns */
+    margin: 0;
 }
 
 ul.masonry img {
