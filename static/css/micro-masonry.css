@@ -1,10 +1,10 @@
-ul.masonry * {
+ul.grid * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-ul.masonry {
+ul.grid {
     display: block;
     padding: 0;
     margin: 0;
@@ -12,13 +12,13 @@ ul.masonry {
     width: 100%;
 }
 
-ul.masonry li {
+ul.grid li.grid-item {
     width: 33.33%; /* 3 columns */
     margin: 0;
     padding: 0;
 }
 
-ul.masonry img {
+ul.grid li.grid-item img {
     width: 100%;
     height: auto;
     display: block;
@@ -27,7 +27,7 @@ ul.masonry img {
     padding: 0;
 }
 
-ul.masonry img:hover {
+ul.grid li.grid-item img:hover {
     -moz-filter: brightness(70%);
     -webkit-filter: brightness(70%);
     filter: brightness(70%);
@@ -36,7 +36,7 @@ ul.masonry img:hover {
 
 /* Responsive design for different screen sizes */
 @media screen and (max-width: 800px) {
-    ul.masonry li {
+    ul.grid li.grid-item {
         width: 50%; /* 2 columns */
     }
 }
