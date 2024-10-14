@@ -27,6 +27,13 @@ ul.masonry img {
     padding: 0;
 }
 
+ul.masonry img:hover {
+    -moz-filter: brightness(70%);
+    -webkit-filter: brightness(70%);
+    filter: brightness(70%);
+    transition: ease-in-out 0.25s;
+}
+
 /* Responsive design for different screen sizes */
 @media screen and (max-width: 800px) {
     ul.masonry li {
