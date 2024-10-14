@@ -6,10 +6,6 @@
 		{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
 		{{- $list := $category.Pages -}}
 		{{- $len := (len $list) -}}
-
-		{{ $paginator := .Paginate (where .Site.Pages.ByDate.Reverse "Type" "post") (index .Site.Params "archive-paginate" | default 18) }}
-        {{ range $paginator.Pages  }}
-
 		{{ range $index, $value := $list }}
 		{{- .Scratch.Set "include_photo" true -}}
 
@@ -28,16 +24,8 @@
 			</li>
 		{{- end -}}
 		{{- end -}}
-		{{ end }}
+		{{- end -}}
 		</ul>
 	</article>
-	{{ if or ($paginator.HasNext) ($paginator.HasPrev) }}
-        <nav class="main-nav">
-            <ul>
-                <li>{{ if $paginator.HasNext }}<a href="{{ $paginator.Next.URL }}">← Older</a>{{ end }}</li>
-                <li>{{ if $paginator.HasPrev }}<a href="{{ $paginator.Prev.URL }}">Newer →</a>{{ end }}</li>
-            </ul>
-        </nav>
-    {{ end }}
 </main>
 {{ end }}
