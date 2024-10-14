@@ -7,7 +7,7 @@
 		{{- $list := $category.Pages -}}
 		{{- $len := (len $list) -}}
 
-		{{ $paginator := $index (where .Site.Pages.ByDate.Reverse "Type" "post") (index .Site.Params "archive-paginate" | default 18) }}
+		{{ $paginator := .Paginate (where .Site.Pages.ByDate.Reverse "Type" "post") (index .Site.Params "archive-paginate" | default 18) }}
         {{ range $paginator.Pages  }}
 
 		{{ range $index, $value := $list }}
