@@ -11,11 +11,10 @@ ul.grid {
     margin-top: 20px;
     list-style-type: none;
     width: calc(100% + 8px);
-    max-width: 1608px;
 }
 
 ul.grid li.grid-item {
-    width: 25%; /* 4 columns */
+    width: 33.33%; /* 3 columns */
     margin: 0;
     padding: 0;
 }
@@ -38,12 +37,6 @@ ul.grid li.grid-item img:hover {
 }
 
 /* Responsive design for different screen sizes */
-@media screen and (max-width: 1200px) {
-    ul.grid li.grid-item {
-        width: 33.333%; /* 3 columns */
-    }
-}
-
 @media screen and (max-width: 800px) {
     ul.grid li.grid-item {
         width: 50%; /* 2 columns */
