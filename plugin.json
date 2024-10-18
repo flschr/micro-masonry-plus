@@ -6,5 +6,12 @@
 		"/css/micro-masonry.css",
     "/js/masonry.pkgd.min.js",
     "/js/micro-masonry.js"
-	]
+	],
+  "fields": [
+    {
+      "field": "params.photos_category",
+      "label": "Photos Category",
+      "placeholder": "Photos"
+    }
+  ]
 }

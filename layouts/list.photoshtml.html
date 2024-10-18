@@ -1,9 +1,8 @@
 {{ define "main" }}
 <main>
 	<article>
-		<!-- <h2 class="page-title">{{ .Title }}</h2> -->
 		<ul class="grid">
-		{{- $category := index .Site.Taxonomies.categories (lower "Photos") -}}
+		{{- $category := index .Site.Taxonomies.categories (lower .Site.Params.photos_category) -}}
 		{{- $list := $category.Pages -}}
 		{{- $len := (len $list) -}}
 		{{ range $index, $value := $list }}
