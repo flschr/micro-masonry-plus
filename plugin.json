@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "title": "Micro.Masonry",
   "description": "A Micro.blog plug-in to easily add a masonry style layout to your photos page.",
   "includes": [
@@ -11,7 +11,7 @@
     {
       "field": "params.photos_category",
       "label": "Photos Category",
-      "placeholder": "Photos"
+      "placeholder": "Enter your photos category..."
     }
   ]
 }
