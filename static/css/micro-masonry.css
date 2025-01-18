@@ -14,7 +14,7 @@
     break-inside: avoid;
     margin-bottom: 1rem;
     background: #eee;
-    border-radius: 8px;
+    border-radius: 1rem;
     overflow: hidden;
     position: relative;
 }
@@ -39,7 +39,7 @@
 .masonry-grid img.visible {
     opacity: 1;
 }
-.masontry-grid img.visible:hover {
+.masontry-grid img:hover {
     -moz-filter: brightness(70%);
     -webkit-filter: brightness(70%);
     filter: brightness(70%);
