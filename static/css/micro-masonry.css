@@ -39,7 +39,7 @@
 .masonry-grid img.visible {
     opacity: 1;
 }
-.masontry-grid img:hover {
+.masonry-grid img:hover {
     -moz-filter: brightness(70%);
     -webkit-filter: brightness(70%);
     filter: brightness(70%);
