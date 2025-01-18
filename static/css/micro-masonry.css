@@ -13,7 +13,7 @@
 .masonry-grid li {
     break-inside: avoid;
     margin-bottom: 1rem;
-    background: #eee;
+    background: var(--accent-1);
     border-radius: 1rem;
     overflow: hidden;
     position: relative;
@@ -24,7 +24,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #666;
+    color: var(--accent-3);
     z-index: 1;
 }
 .masonry-grid li.loaded::before {
