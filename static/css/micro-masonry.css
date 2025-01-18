@@ -8,11 +8,11 @@
     margin: 0;
     list-style: none;
     column-count: 4;
-    column-gap: 1em;
+    column-gap: 1rem;
 }
 .masonry-grid li {
     break-inside: avoid;
-    margin-bottom: 1em;
+    margin-bottom: 1rem;
     background: #eee;
     border-radius: 8px;
     overflow: hidden;
@@ -44,6 +44,11 @@
     -webkit-filter: brightness(70%);
     filter: brightness(70%);
     transition: ease-in-out 0.25s;
+}
+@media (max-width: 1600px) {
+    .masonry-grid {
+        column-count: 4;
+    }
 }
 @media (max-width: 1200px) {
     .masonry-grid {
