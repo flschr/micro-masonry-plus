@@ -1,44 +1,62 @@
-ul.grid * {
+.masonry-grid * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
-
-ul.grid {
-    display: block;
+.masonry-grid {
     padding: 0;
-    margin: 0 -4px;
-    margin-top: 20px;
-    list-style-type: none;
-    width: calc(100% + 8px);
-}
-
-ul.grid li.grid-item {
-    width: 33.33%; /* 3 columns */
     margin: 0;
-    padding: 0;
+    list-style: none;
+    column-count: 4;
+    column-gap: 1em;
 }
-
-ul.grid li.grid-item img {
+.masonry-grid li {
+    break-inside: avoid;
+    margin-bottom: 1em;
+    background: #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+.masonry-grid li::before {
+    content: "Loading...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    z-index: 1;
+}
+.masonry-grid li.loaded::before {
+    display: none;
+}
+.masonry-grid img {
     width: 100%;
-    height: auto;
     display: block;
-    border: solid 4px transparent;
-    border-radius: 0;
-    margin: 0;
-    padding: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
-
-ul.grid li.grid-item img:hover {
+.masonry-grid img.visible {
+    opacity: 1;
+}
+.masontry-grid img.visible:hover {
     -moz-filter: brightness(70%);
     -webkit-filter: brightness(70%);
     filter: brightness(70%);
     transition: ease-in-out 0.25s;
 }
-
-/* Responsive design for different screen sizes */
-@media screen and (max-width: 800px) {
-    ul.grid li.grid-item {
-        width: 50%; /* 2 columns */
+@media (max-width: 1200px) {
+    .masonry-grid {
+        column-count: 3;
+    }
+}
+@media (max-width: 900px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+@media (max-width: 600px) {
+    .masonry-grid {
+        column-count: 1;
     }
 }
