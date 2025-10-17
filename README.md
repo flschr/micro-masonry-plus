@@ -9,6 +9,7 @@ This fork is maintained by [René Fischer](https://fischr.org) and is based on [
 - Configurable **allowed file extensions**
 - Adjustable **column counts** for desktop, tablet, and mobile breakpoints
 - Optional **layout mode** to choose column-first or row-first arrangement
+- Section exclusions to keep non-photo pages (e.g. book covers) out of the gallery
 - Lightweight lazy loading with graceful loading and error states
 - Pure CSS/JS solution that respects your existing Micro.blog theme
 
@@ -30,12 +31,18 @@ All options are available in the Micro.blog plug-in settings panel:
 - `Mobile column count` – number of columns below 600 px (default `2`)
 - `Show all photos per post` – toggle to display every photo or only the first image from each post (default `true`)
 - `Layout mode` – choose between `columns` (column-first Masonry) and `rows` (row-first Masonry) (default `columns`)
+- `Exclude sections` – comma-separated list of sections that should never appear in the gallery (e.g. `books,reading`)
 
 ## 🙏 Credits
 - [jimmitchell/micro-masonry](https://github.com/jimmitchell/micro-masonry) – original plug-in
 - Micro.blog community for inspiration and testing
 
 ## Changelog
+
+### 2.4.0
+- Added exclusion list for sections (e.g. bookshelf pages) and exposed it as a plug-in setting
+- `Show all photos per post` is now a checkbox in Micro.blog settings
+- Removed gray loading background behind photos for cleaner presentation
 
 ### 2.3.0
 - Added optional layout mode to switch between column-first and row-first masonry ordering

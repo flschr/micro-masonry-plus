@@ -27,6 +27,7 @@
 	{{- $optionsScratch := newScratch -}}
 	{{- $optionsScratch.Set "showAll" true -}}
 	{{- $optionsScratch.Set "layout" "columns" -}}
+	{{- $optionsScratch.Set "excludeSections" (slice) -}}
 	{{- with .Site.Params.photos_show_all }}
 		{{- $value := lower (trim (printf "%v" .) " \r\n\t") -}}
 		{{- if or (eq $value "false") (eq $value "0") (eq $value "no") (eq $value "off") }}
@@ -37,6 +38,16 @@
 		{{- $value := lower (trim (printf "%v" .) " \r\n\t") -}}
 		{{- if in (slice "columns" "rows") $value }}
 			{{- $optionsScratch.Set "layout" $value -}}
+		{{- end }}
+	{{- end }}
+	{{- with .Site.Params.photos_exclude_sections }}
+		{{- $raw := printf "%v" . -}}
+		{{- $normalized := replaceRE `[;\s]+` "," $raw -}}
+		{{- range split $normalized "," }}
+			{{- $section := lower (trim . " ,.\r\n\t") -}}
+			{{- if and $section (not (in ($optionsScratch.Get "excludeSections") $section)) }}
+				{{- $optionsScratch.Add "excludeSections" (slice $section) -}}
+			{{- end }}
 		{{- end }}
 	{{- end }}
 	{{- $layoutMode := $optionsScratch.Get "layout" -}}
@@ -68,12 +79,15 @@
 	{{- $imagePattern := printf `(?i)\.(?:%s)(?:\?.*)?$` (delimit $extensions "|") -}}
 	{{- $markdownPattern := `!\[[^\]]*\]\(\s*([^)\s]+)(?:\s+["'][^"']*["'])?\s*\)` -}}
 	{{- $htmlImgPattern := `<img[^>]+src=["']([^"']+)["'][^>]*>` -}}
+	{{- $excludeSections := $optionsScratch.Get "excludeSections" -}}
 	{{- range $page := $list }}
-		{{- $scratch := newScratch -}}
-		{{- $scratch.Set "photos" (slice) -}}
-		{{- with $page.Params.photos }}
-			{{- $photos := . -}}
-			{{- $type := printf "%T" $photos -}}
+		{{- $section := lower (or $page.Section "") -}}
+		{{- if not (in $excludeSections $section) }}
+			{{- $scratch := newScratch -}}
+			{{- $scratch.Set "photos" (slice) -}}
+			{{- with $page.Params.photos }}
+				{{- $photos := . -}}
+				{{- $type := printf "%T" $photos -}}
 			{{- if (hasPrefix $type "[]") }}
 				{{- range $photos }}
 					{{- $src := trim . " \r\n\t" -}}
@@ -106,17 +120,18 @@
 			{{- end }}
 		{{- end }}
 		{{- $photos := $scratch.Get "photos" -}}
-		{{- if gt (len $photos) 0 }}
-			{{- $scratch.Set "photos_display" $photos -}}
-			{{- if and (not ($optionsScratch.Get "showAll")) (gt (len $photos) 0) }}
-				{{- $scratch.Set "photos_display" (slice (index $photos 0)) -}}
-			{{- end }}
-			{{- range $src := $scratch.Get "photos_display" }}
-				<li>
-					<a href="{{ $page.Permalink }}">
-						<img src="{{ $src | absURL | safeURL }}" loading="lazy" decoding="async" alt="{{ with $page.Title }}{{ . | plainify }}{{ else }}Photo{{ end }}" />
-					</a>
-				</li>
+			{{- if gt (len $photos) 0 }}
+				{{- $scratch.Set "photos_display" $photos -}}
+				{{- if and (not ($optionsScratch.Get "showAll")) (gt (len $photos) 0) }}
+					{{- $scratch.Set "photos_display" (slice (index $photos 0)) -}}
+				{{- end }}
+				{{- range $src := $scratch.Get "photos_display" }}
+					<li>
+						<a href="{{ $page.Permalink }}">
+							<img src="{{ $src | absURL | safeURL }}" loading="lazy" decoding="async" alt="{{ with $page.Title }}{{ . | plainify }}{{ else }}Photo{{ end }}" />
+						</a>
+					</li>
+				{{- end }}
 			{{- end }}
 		{{- end }}
 	{{- end }}
