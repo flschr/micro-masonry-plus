@@ -134,43 +134,45 @@
 					<li>
 						<a href="{{ $page.Permalink }}">
 							{{- $abs := $src | absURL -}}
-							{{- if templates.Exists "partials/render-image.html" }}
-								{{- $renderContext := dict "Destination" $src "Page" $page "Text" $alt "Title" $title -}}
-								{{- $rendered := partial "render-image.html" $renderContext -}}
-								{{- $extraAttrs := slice -}}
-								{{- if not (in $rendered "loading=") }}
-									{{- $extraAttrs = $extraAttrs | append (printf `loading="%s"` $loadingAttr) -}}
-								{{- end }}
-								{{- if not (in $rendered "decoding=") }}
-									{{- $extraAttrs = $extraAttrs | append `decoding="async"` -}}
-								{{- end }}
-								{{- if and (ne $fetchPriority "") (not (in $rendered "fetchpriority=")) }}
-									{{- $extraAttrs = $extraAttrs | append (printf `fetchpriority="%s"` $fetchPriority) -}}
-								{{- end }}
-								{{- if gt (len $extraAttrs) 0 }}
-									{{- $attrsString := printf " %s" (delimit $extraAttrs " ") -}}
-									{{- $rendered = replace $rendered "<img" (printf "<img%s" $attrsString) 1 -}}
-								{{- end }}
-								{{- $rendered | safeHTML -}}
-							{{- else }}
-								{{- $isMB := or (hasPrefix $abs "https://micro.blog/photos/") (hasPrefix $abs "http://micro.blog/photos/") -}}
-								{{- $isMB = or $isMB (hasPrefix $abs "https://cdn.micro.blog/") -}}
-								{{- $src600 := "" -}}
-								{{- $src1200 := "" -}}
-								{{- if $isMB }}
-									{{- if or (hasPrefix $abs "https://micro.blog/photos/") (hasPrefix $abs "http://micro.blog/photos/") }}
-										{{- $src600 = replaceRE `/photos/[^/]+/` "/photos/600x/" $abs -}}
-										{{- $src1200 = replaceRE `/photos/[^/]+/` "/photos/1200x/" $abs -}}
-									{{- else }}
-										{{- $encoded := (printf "%s" $abs) | urlquery -}}
-										{{- $src600 = printf "https://micro.blog/photos/600x/%s" $encoded -}}
-										{{- $src1200 = printf "https://micro.blog/photos/1200x/%s" $encoded -}}
+							{{- $sizes := "(max-width: 640px) 100vw, (max-width: 1024px) 95vw, 720px" -}}
+							{{- $resource := cond (or (hasPrefix $src "http://") (hasPrefix $src "https://")) nil ($page.Resources.GetMatch $src) -}}
+							{{- if $resource }}
+								{{- $widths := slice 400 768 1024 1440 -}}
+								{{- $srcset := slice -}}
+								{{- range $width := $widths }}
+									{{- $derivative := $resource.Fit (printf "%dx q85" $width) -}}
+									{{- if $derivative }}
+										{{- $srcset = $srcset | append (printf "%s %dw" $derivative.RelPermalink $width) -}}
 									{{- end }}
 								{{- end }}
+								{{- $default := $resource.Fit "1024x q85" -}}
+								{{- if not $default }}
+									{{- $default = $resource -}}
+								{{- end }}
+								<img src="{{ $default.RelPermalink }}" srcset="{{ delimit $srcset ", " }}" sizes="{{ $sizes }}" width="{{ $default.Width }}" height="{{ $default.Height }}" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
+							{{- else }}
+								{{- $isMBPhotos := or (hasPrefix $abs "https://micro.blog/photos/") (hasPrefix $abs "http://micro.blog/photos/") -}}
+								{{- $isMBUploads := or (hasPrefix $abs "https://cdn.micro.blog/") (hasPrefix $abs "https://micro.blog/uploads/") (hasPrefix $abs "https://us.uploads.micro.blog/") (hasPrefix $abs "https://eu.uploads.micro.blog/") (hasPrefix $abs "https://micro.blog/uploads/") -}}
+								{{- $src300 := "" -}}
+								{{- $src600 := "" -}}
+								{{- $src1200 := "" -}}
+								{{- if $isMBPhotos }}
+									{{- $src300 = replaceRE `/photos/[^/]+/` "/photos/300x/" $abs -}}
+									{{- $src600 = replaceRE `/photos/[^/]+/` "/photos/600x/" $abs -}}
+									{{- $src1200 = replaceRE `/photos/[^/]+/` "/photos/1200x/" $abs -}}
+								{{- else if $isMBUploads }}
+									{{- $encoded := $abs | urlquery -}}
+									{{- $src300 = printf "https://micro.blog/photos/300x/%s" $encoded -}}
+									{{- $src600 = printf "https://micro.blog/photos/600x/%s" $encoded -}}
+									{{- $src1200 = printf "https://micro.blog/photos/1200x/%s" $encoded -}}
+								{{- else }}
+									{{- $encoded := $abs | urlquery -}}
+									{{- $src300 = printf "https://micro.blog/photos/300x/%s" $encoded -}}
+									{{- $src600 = printf "https://micro.blog/photos/600x/%s" $encoded -}}
+									{{- $src1200 = printf "https://micro.blog/photos/1200x/%s" $encoded -}}
+								{{- end }}
 								{{- if and $src600 $src1200 }}
-									{{- $desktopCols := $columnsScratch.Get "desktop" -}}
-									{{- $gapCount := sub $desktopCols 1 -}}
-									<img src="{{ $src600 | safeURL }}" srcset="{{ $src600 | safeURL }} 600w, {{ $src1200 | safeURL }} 1200w" sizes="(max-width: 600px) 100vw, calc((100vw - ({{ $gapCount }} * 1rem)) / {{ $desktopCols }})" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
+									<img src="{{ $src600 | safeURL }}" srcset="{{ $src300 | safeURL }} 300w, {{ $src600 | safeURL }} 600w, {{ $src1200 | safeURL }} 1200w" sizes="{{ $sizes }}" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
 								{{- else }}
 									<img src="{{ $abs | safeURL }}" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
 								{{- end }}
@@ -212,7 +214,7 @@ function clearLoadingState(listItem) {
 	listItem.classList.remove('loading');
 }
 function updateGridSpan(imageElement) {
-	if (!gridElement || layoutMode !== 'rows' || !imageElement) return;
+	if (!gridElement || (layoutMode !== 'rows' && layoutMode !== 'columns') || !imageElement) return;
 	const listItem = imageElement.closest('li');
 	if (!listItem) return;
 	const computedStyle = getComputedStyle(gridElement);
@@ -222,7 +224,7 @@ function updateGridSpan(imageElement) {
 	listItem.style.gridRowEnd = `span ${span}`;
 }
 const refreshGridSpans = debounce(() => {
-	if (!gridElement || layoutMode !== 'rows') return;
+	if (!gridElement || (layoutMode !== 'rows' && layoutMode !== 'columns')) return;
 	gridElement.querySelectorAll('li img.visible').forEach(img => updateGridSpan(img));
 }, 150);
 function handleImage(imageElement) {

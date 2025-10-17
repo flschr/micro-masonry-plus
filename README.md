@@ -10,9 +10,9 @@ This fork is maintained by [René Fischer](https://fischr.org) and is based on [
 - Adjustable **column counts** for desktop, tablet, and mobile breakpoints
 - Optional **layout mode** to choose column-first or row-first arrangement
 - Focuses on regular blog posts so bookshelf and static pages stay out of the grid
-- Lightweight lazy loading with graceful loading and error states
+- Lightweight lazy loading with graceful placeholders and scroll-aware eager loading for the first rows
 - Pure CSS/JS solution that respects your existing Micro.blog theme
-- Automatically reuses a site’s `render-image.html` partial (if present) and falls back to Micro.blog CDN sizes for everyone else
+- Built-in responsive `srcset` generation for local assets and Micro.blog-hosted uploads
 
 ![](docs/example.jpg)
 
@@ -38,11 +38,11 @@ All options are available in the Micro.blog plug-in settings panel:
 
 ## Changelog
 
-### 2.5.0
-- Automatically integrates with `render-image.html` when available and attaches Micro.blog CDN `srcset` fallbacks otherwise
+### 2.6.0
+- Generates responsive image derivatives directly in the plug-in (local resources and Micro.blog uploads), so no theme partial is required
 - Replaced the spinner with a subtle skeleton placeholder and delayed activation to avoid flashes on cached images
 - Prioritises the first rows of photos (`loading="eager"` + `fetchpriority`) and widens the preload margin so images appear in scroll order
-- Normalised masonry gap handling (especially on mobile) so horizontal and vertical spacing match more closely
+- Normalised masonry gap handling (including mobile) using CSS grid to eliminate layout gaps
 
 ### 2.4.0
 - `Show all photos per post` is now a checkbox in Micro.blog settings
