@@ -40,8 +40,9 @@ All options are available in the Micro.blog plug-in settings panel:
 
 ### 2.5.0
 - Automatically integrates with `render-image.html` when available and attaches Micro.blog CDN `srcset` fallbacks otherwise
-- Defers and softens the loading overlay to avoid flashes on cached images
-- Normalised masonry gap handling so horizontal and vertical spacing match
+- Replaced the spinner with a subtle skeleton placeholder and delayed activation to avoid flashes on cached images
+- Prioritises the first rows of photos (`loading="eager"` + `fetchpriority`) and widens the preload margin so images appear in scroll order
+- Normalised masonry gap handling (especially on mobile) so horizontal and vertical spacing match more closely
 
 ### 2.4.0
 - `Show all photos per post` is now a checkbox in Micro.blog settings

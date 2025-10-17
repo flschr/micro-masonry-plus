@@ -40,6 +40,8 @@
 		{{- end }}
 	{{- end }}
 	{{- $layoutMode := $optionsScratch.Get "layout" -}}
+	{{- $imageTracker := newScratch -}}
+	{{- $imageTracker.Set "count" 0 -}}
 	<ul class="masonry-grid {{ if eq $layoutMode "rows" }}masonry-grid--rows{{ else }}masonry-grid--columns{{ end }}" data-layout="{{ $layoutMode }}" style="--masonry-columns-desktop: {{ $columnsScratch.Get "desktop" }}; --masonry-columns-tablet: {{ $columnsScratch.Get "tablet" }}; --masonry-columns-mobile: {{ $columnsScratch.Get "mobile" }};">
 	{{- $list := .Site.RegularPages -}}
 	{{- $list = where $list "Type" "post" -}}
@@ -114,6 +116,16 @@
 				{{- end }}
 				{{- $display := $scratch.Get "photos_display" -}}
 				{{- range $src := $display }}
+					{{- $index := add ($imageTracker.Get "count") 1 -}}
+					{{- $imageTracker.Set "count" $index -}}
+					{{- $prefetchRows := 2 -}}
+					{{- $prefetchThreshold := mul ($columnsScratch.Get "desktop") $prefetchRows -}}
+					{{- $loadingAttr := "lazy" -}}
+					{{- $fetchPriority := "" -}}
+					{{- if le $index $prefetchThreshold }}
+						{{- $loadingAttr = "eager" -}}
+						{{- $fetchPriority = "high" -}}
+					{{- end }}
 					{{- $alt := "Photo" -}}
 					{{- with $page.Title }}
 						{{- $alt = plainify . -}}
@@ -127,10 +139,13 @@
 								{{- $rendered := partial "render-image.html" $renderContext -}}
 								{{- $extraAttrs := slice -}}
 								{{- if not (in $rendered "loading=") }}
-									{{- $extraAttrs = $extraAttrs | append `loading="lazy"` -}}
+									{{- $extraAttrs = $extraAttrs | append (printf `loading="%s"` $loadingAttr) -}}
 								{{- end }}
 								{{- if not (in $rendered "decoding=") }}
 									{{- $extraAttrs = $extraAttrs | append `decoding="async"` -}}
+								{{- end }}
+								{{- if and (ne $fetchPriority "") (not (in $rendered "fetchpriority=")) }}
+									{{- $extraAttrs = $extraAttrs | append (printf `fetchpriority="%s"` $fetchPriority) -}}
 								{{- end }}
 								{{- if gt (len $extraAttrs) 0 }}
 									{{- $attrsString := printf " %s" (delimit $extraAttrs " ") -}}
@@ -155,9 +170,9 @@
 								{{- if and $src600 $src1200 }}
 									{{- $desktopCols := $columnsScratch.Get "desktop" -}}
 									{{- $gapCount := sub $desktopCols 1 -}}
-									<img src="{{ $src600 | safeURL }}" srcset="{{ $src600 | safeURL }} 600w, {{ $src1200 | safeURL }} 1200w" sizes="(max-width: 600px) 100vw, calc((100vw - ({{ $gapCount }} * 1rem)) / {{ $desktopCols }})" loading="lazy" decoding="async" alt="{{ $alt }}" />
+									<img src="{{ $src600 | safeURL }}" srcset="{{ $src600 | safeURL }} 600w, {{ $src1200 | safeURL }} 1200w" sizes="(max-width: 600px) 100vw, calc((100vw - ({{ $gapCount }} * 1rem)) / {{ $desktopCols }})" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
 								{{- else }}
-									<img src="{{ $abs | safeURL }}" loading="lazy" decoding="async" alt="{{ $alt }}" />
+									<img src="{{ $abs | safeURL }}" loading="{{ $loadingAttr }}" {{ if ne $fetchPriority "" }}fetchpriority="{{ $fetchPriority }}"{{ end }} decoding="async" alt="{{ $alt }}" />
 								{{- end }}
 							{{- end }}
 						</a>
@@ -255,7 +270,7 @@ const observer = new IntersectionObserver((entries) => {
 		}
 	});
 }, {
-	rootMargin: '50px'
+	rootMargin: '200px 0px'
 });
 document.querySelectorAll('.masonry-grid img').forEach(img => {
 	if (!img.complete) {
