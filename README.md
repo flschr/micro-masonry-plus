@@ -12,6 +12,7 @@ This fork is maintained by [René Fischer](https://fischr.org) and is based on [
 - Focuses on regular blog posts so bookshelf and static pages stay out of the grid
 - Lightweight lazy loading with graceful loading and error states
 - Pure CSS/JS solution that respects your existing Micro.blog theme
+- Automatically reuses a site’s `render-image.html` partial (if present) and falls back to Micro.blog CDN sizes for everyone else
 
 ![](docs/example.jpg)
 
@@ -36,6 +37,11 @@ All options are available in the Micro.blog plug-in settings panel:
 - [jimmitchell/micro-masonry](https://github.com/jimmitchell/micro-masonry) – original plug-in
 
 ## Changelog
+
+### 2.5.0
+- Automatically integrates with `render-image.html` when available and attaches Micro.blog CDN `srcset` fallbacks otherwise
+- Defers and softens the loading overlay to avoid flashes on cached images
+- Normalised masonry gap handling so horizontal and vertical spacing match
 
 ### 2.4.0
 - `Show all photos per post` is now a checkbox in Micro.blog settings
