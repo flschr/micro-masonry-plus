@@ -27,7 +27,6 @@
 	{{- $optionsScratch := newScratch -}}
 	{{- $optionsScratch.Set "showAll" true -}}
 	{{- $optionsScratch.Set "layout" "columns" -}}
-	{{- $optionsScratch.Set "excludeSections" (slice) -}}
 	{{- with .Site.Params.photos_show_all }}
 		{{- $value := lower (trim (printf "%v" .) " \r\n\t") -}}
 		{{- if or (eq $value "false") (eq $value "0") (eq $value "no") (eq $value "off") }}
@@ -40,19 +39,10 @@
 			{{- $optionsScratch.Set "layout" $value -}}
 		{{- end }}
 	{{- end }}
-	{{- with .Site.Params.photos_exclude_sections }}
-		{{- $raw := printf "%v" . -}}
-		{{- $normalized := replaceRE `[;\s]+` "," $raw -}}
-		{{- range split $normalized "," }}
-			{{- $section := lower (trim . " ,.\r\n\t") -}}
-			{{- if and $section (not (in ($optionsScratch.Get "excludeSections") $section)) }}
-				{{- $optionsScratch.Add "excludeSections" (slice $section) -}}
-			{{- end }}
-		{{- end }}
-	{{- end }}
 	{{- $layoutMode := $optionsScratch.Get "layout" -}}
 	<ul class="masonry-grid {{ if eq $layoutMode "rows" }}masonry-grid--rows{{ else }}masonry-grid--columns{{ end }}" data-layout="{{ $layoutMode }}" style="--masonry-columns-desktop: {{ $columnsScratch.Get "desktop" }}; --masonry-columns-tablet: {{ $columnsScratch.Get "tablet" }}; --masonry-columns-mobile: {{ $columnsScratch.Get "mobile" }};">
 	{{- $list := .Site.RegularPages -}}
+	{{- $list = where $list "Type" "post" -}}
 	{{- $category := index .Site.Taxonomies.categories (lower .Site.Params.photos_category) -}}
 	{{- if $category }}
 		{{- $list = $category.Pages -}}
@@ -79,10 +69,7 @@
 	{{- $imagePattern := printf `(?i)\.(?:%s)(?:\?.*)?$` (delimit $extensions "|") -}}
 	{{- $markdownPattern := `!\[[^\]]*\]\(\s*([^)\s]+)(?:\s+["'][^"']*["'])?\s*\)` -}}
 	{{- $htmlImgPattern := `<img[^>]+src=["']([^"']+)["'][^>]*>` -}}
-	{{- $excludeSections := $optionsScratch.Get "excludeSections" -}}
 	{{- range $page := $list }}
-		{{- $section := lower (or $page.Section "") -}}
-		{{- if not (in $excludeSections $section) }}
 			{{- $scratch := newScratch -}}
 			{{- $scratch.Set "photos" (slice) -}}
 			{{- with $page.Params.photos }}
@@ -133,7 +120,6 @@
 					</li>
 				{{- end }}
 			{{- end }}
-		{{- end }}
 	{{- end }}
 	</ul>
 <script>
@@ -148,8 +134,24 @@
 			timeout = setTimeout(later, wait);
 		};
 	}
-	const gridElement = document.querySelector('.masonry-grid');
-	const layoutMode = gridElement ? (gridElement.dataset.layout || 'columns') : 'columns';
+const gridElement = document.querySelector('.masonry-grid');
+const layoutMode = gridElement ? (gridElement.dataset.layout || 'columns') : 'columns';
+function scheduleLoadingState(listItem) {
+	if (!listItem || listItem.classList.contains('loaded')) return;
+	if (listItem._masonryLoadingTimer) return;
+	listItem._masonryLoadingTimer = setTimeout(() => {
+		listItem.classList.add('loading');
+		listItem._masonryLoadingTimer = null;
+	}, 120);
+}
+function clearLoadingState(listItem) {
+	if (!listItem) return;
+	if (listItem._masonryLoadingTimer) {
+		clearTimeout(listItem._masonryLoadingTimer);
+		listItem._masonryLoadingTimer = null;
+	}
+	listItem.classList.remove('loading');
+}
 	function updateGridSpan(imageElement) {
 		if (!gridElement || layoutMode !== 'rows' || !imageElement) return;
 		const listItem = imageElement.closest('li');
@@ -164,29 +166,36 @@
 		if (!gridElement || layoutMode !== 'rows') return;
 		gridElement.querySelectorAll('li img.visible').forEach(img => updateGridSpan(img));
 	}, 150);
-	function handleImage(imageElement) {
-		if (!imageElement) return;
-		const listItem = imageElement.closest('li');
-		imageElement.addEventListener('load', function() {
-			listItem.classList.add('loaded');
-			imageElement.classList.add('visible');
-			if (layoutMode === 'rows') {
-				updateGridSpan(imageElement);
-			}
-		});
-		imageElement.addEventListener('error', function() {
-			listItem.innerHTML = 'Failed to load image';
-			listItem.style.padding = '2rem';
-			listItem.style.textAlign = 'center';
-		});
-		if (imageElement.complete) {
-			listItem.classList.add('loaded');
-			imageElement.classList.add('visible');
-			if (layoutMode === 'rows') {
-				updateGridSpan(imageElement);
-			}
+function handleImage(imageElement) {
+	if (!imageElement) return;
+	const listItem = imageElement.closest('li');
+	if (!listItem) return;
+	if (!imageElement.complete) {
+		scheduleLoadingState(listItem);
+	}
+	imageElement.addEventListener('load', function() {
+		clearLoadingState(listItem);
+		listItem.classList.add('loaded');
+		imageElement.classList.add('visible');
+		if (layoutMode === 'rows') {
+			updateGridSpan(imageElement);
+		}
+	});
+	imageElement.addEventListener('error', function() {
+		clearLoadingState(listItem);
+		listItem.innerHTML = 'Failed to load image';
+		listItem.style.padding = '2rem';
+		listItem.style.textAlign = 'center';
+	});
+	if (imageElement.complete) {
+		clearLoadingState(listItem);
+		listItem.classList.add('loaded');
+		imageElement.classList.add('visible');
+		if (layoutMode === 'rows') {
+			updateGridSpan(imageElement);
 		}
 	}
+}
 	if (gridElement && layoutMode === 'rows') {
 		window.addEventListener('resize', refreshGridSpans);
 	}
@@ -205,12 +214,15 @@
 		rootMargin: '50px'
 	});
 	document.querySelectorAll('.masonry-grid img').forEach(img => {
-		if (img.loading === 'lazy') {
-			observer.observe(img);
-		} else {
-			handleImage(img);
-			if (layoutMode === 'rows') {
-				refreshGridSpans();
+	if (!img.complete) {
+		scheduleLoadingState(img.closest('li'));
+	}
+	if (img.loading === 'lazy') {
+		observer.observe(img);
+	} else {
+		handleImage(img);
+		if (layoutMode === 'rows') {
+			refreshGridSpans();
 			}
 		}
 	});

@@ -38,11 +38,6 @@
       "default": true
     },
     {
-      "field": "params.photos_exclude_sections",
-      "label": "Exclude sections",
-      "placeholder": "e.g. books,moechte-ich-lesen"
-    },
-    {
       "field": "params.photos_layout_mode",
       "label": "Layout mode",
       "placeholder": "columns (default) or rows"

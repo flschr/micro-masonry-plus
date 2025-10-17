@@ -4,7 +4,7 @@
     padding: 0;
 }
 .masonry-grid {
-    padding: 0;
+    padding: 0 0 0.5em 0;
     margin: 0;
     list-style: none;
     column-gap: 1em;
@@ -20,11 +20,12 @@
     grid-template-columns: repeat(var(--masonry-columns-desktop, 4), minmax(0, 1fr));
     grid-auto-rows: calc(var(--masonry-row-height, 8) * 1px);
     grid-row-gap: 1em;
+    grid-column-gap: 1em;
     justify-items: stretch;
 }
 .masonry-grid li {
     break-inside: avoid;
-    margin-bottom: 1em;
+    margin: 0;
     overflow: hidden;
     position: relative;
     background: transparent;
@@ -32,29 +33,66 @@
 .masonry-grid--columns li {
     margin-bottom: 1em;
 }
-.masonry-grid--rows li {
+.masonry-grid--columns li:last-child {
     margin-bottom: 0;
 }
 .masonry-grid li::before {
-    content: "Loading...";
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.masonry-grid li::after {
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    z-index: 1;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-top-color: rgba(0, 0, 0, 0.45);
+    animation: masonry-spin 0.8s linear infinite;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+    pointer-events: none;
 }
-.masonry-grid li.loaded::before {
-    display: none;
+.masonry-grid li.loading::before,
+.masonry-grid li.loading::after {
+    opacity: 1;
+}
+.masonry-grid li.loaded::before,
+.masonry-grid li.loaded::after {
+    opacity: 0;
 }
 .masonry-grid img {
     width: 100%;
     display: block;
     opacity: 0;
     transition: opacity 0.3s ease;
+    position: relative;
+    z-index: 3;
 }
 .masonry-grid img.visible {
     opacity: 1;
+}
+
+@keyframes masonry-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 .masonry-grid img:hover {
     -moz-filter: brightness(70%);
