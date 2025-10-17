@@ -1,5 +1,5 @@
 # Micro.Masonry Plus
-![](icon.png)
+<img src="logo.png" alt="Micro.Masonry Plus Logo" width="200">
 
 **Micro.Masonry Plus** adds a responsive masonry-style gallery to your Micro.blog photos page.  
 This fork is maintained by [René Fischer](https://fischr.org) and is based on [jimmitchell/micro-masonry](https://github.com/jimmitchell/micro-masonry).
@@ -13,8 +13,6 @@ This fork is maintained by [René Fischer](https://fischr.org) and is based on [
 - Lightweight lazy loading with graceful placeholders and scroll-aware eager loading for the first rows
 - Pure CSS/JS solution that respects your existing Micro.blog theme
 - Built-in responsive `srcset` generation for local assets and Micro.blog-hosted uploads
-
-![](docs/example.jpg)
 
 ## 📦 Installation
 Install the plug-in from the **Micro.blog plug-in directory** or upload this repository as a custom plug-in. After installation, open the plug-in settings to configure it.
