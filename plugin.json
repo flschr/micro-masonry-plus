@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0",
+  "version": "2.3.0",
   "title": "Micro.Masonry Plus",
   "description": "A advanced Micro.blog plug-in to display your photos page in a configurable masonry-style layout.",
   "includes": [
@@ -30,6 +30,16 @@
       "field": "params.photos_columns_mobile",
       "label": "Mobile column count",
       "placeholder": "Default 2"
+    },
+    {
+      "field": "params.photos_show_all",
+      "label": "Show all photos per post",
+      "placeholder": "true (default) or false"
+    },
+    {
+      "field": "params.photos_layout_mode",
+      "label": "Layout mode",
+      "placeholder": "columns (default) or rows"
     }
   ]
 }

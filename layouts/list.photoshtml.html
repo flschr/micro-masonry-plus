@@ -2,7 +2,7 @@
 	{{- $columnsScratch := newScratch -}}
 	{{- $columnsScratch.Set "desktop" 4 -}}
 	{{- $columnsScratch.Set "tablet" 3 -}}
-		{{- $columnsScratch.Set "mobile" 2 -}}
+	{{- $columnsScratch.Set "mobile" 2 -}}
 	{{- with .Site.Params.photos_columns_desktop }}
 		{{- $value := replaceRE `[^0-9]+` "" (printf "%v" .) -}}
 		{{- if ne $value "" }}
@@ -24,7 +24,23 @@
 			{{- $columnsScratch.Set "mobile" (cond (lt $parsed 1) 1 (cond (gt $parsed 8) 8 $parsed)) -}}
 		{{- end }}
 	{{- end }}
-	<ul class="masonry-grid" style="--masonry-columns-desktop: {{ $columnsScratch.Get "desktop" }}; --masonry-columns-tablet: {{ $columnsScratch.Get "tablet" }}; --masonry-columns-mobile: {{ $columnsScratch.Get "mobile" }};">
+	{{- $optionsScratch := newScratch -}}
+	{{- $optionsScratch.Set "showAll" true -}}
+	{{- $optionsScratch.Set "layout" "columns" -}}
+	{{- with .Site.Params.photos_show_all }}
+		{{- $value := lower (trim (printf "%v" .) " \r\n\t") -}}
+		{{- if or (eq $value "false") (eq $value "0") (eq $value "no") (eq $value "off") }}
+			{{- $optionsScratch.Set "showAll" false -}}
+		{{- end }}
+	{{- end }}
+	{{- with .Site.Params.photos_layout_mode }}
+		{{- $value := lower (trim (printf "%v" .) " \r\n\t") -}}
+		{{- if in (slice "columns" "rows") $value }}
+			{{- $optionsScratch.Set "layout" $value -}}
+		{{- end }}
+	{{- end }}
+	{{- $layoutMode := $optionsScratch.Get "layout" -}}
+	<ul class="masonry-grid {{ if eq $layoutMode "rows" }}masonry-grid--rows{{ else }}masonry-grid--columns{{ end }}" data-layout="{{ $layoutMode }}" style="--masonry-columns-desktop: {{ $columnsScratch.Get "desktop" }}; --masonry-columns-tablet: {{ $columnsScratch.Get "tablet" }}; --masonry-columns-mobile: {{ $columnsScratch.Get "mobile" }};">
 	{{- $list := .Site.RegularPages -}}
 	{{- $category := index .Site.Taxonomies.categories (lower .Site.Params.photos_category) -}}
 	{{- if $category }}
@@ -35,11 +51,11 @@
 	{{- $configScratch.Set "extensions" $defaultExtensions -}}
 	{{- with .Site.Params.photos_extensions }}
 		{{- $raw := printf "%v" . -}}
-		{{- $normalized := replaceRE `[;\s]+` $raw "," -}}
+		{{- $normalized := replaceRE `[;\s]+` "," $raw -}}
 		{{- $candidateScratch := newScratch -}}
 		{{- $candidateScratch.Set "list" (slice) -}}
 		{{- range split $normalized "," }}
-			{{- $ext := lower (replaceRE `[^a-z0-9]+` (trim . " .\r\n\t") "") -}}
+			{{- $ext := lower (replaceRE `[^a-z0-9]+` "" (trim . " .\r\n\t")) -}}
 			{{- if and $ext (not (in ($candidateScratch.Get "list") $ext)) }}
 				{{- $candidateScratch.Add "list" (slice $ext) -}}
 			{{- end }}
@@ -91,7 +107,11 @@
 		{{- end }}
 		{{- $photos := $scratch.Get "photos" -}}
 		{{- if gt (len $photos) 0 }}
-			{{- range $src := $photos }}
+			{{- $scratch.Set "photos_display" $photos -}}
+			{{- if and (not ($optionsScratch.Get "showAll")) (gt (len $photos) 0) }}
+				{{- $scratch.Set "photos_display" (slice (index $photos 0)) -}}
+			{{- end }}
+			{{- range $src := $scratch.Get "photos_display" }}
 				<li>
 					<a href="{{ $page.Permalink }}">
 						<img src="{{ $src | absURL | safeURL }}" loading="lazy" decoding="async" alt="{{ with $page.Title }}{{ . | plainify }}{{ else }}Photo{{ end }}" />
@@ -113,12 +133,31 @@
 			timeout = setTimeout(later, wait);
 		};
 	}
+	const gridElement = document.querySelector('.masonry-grid');
+	const layoutMode = gridElement ? (gridElement.dataset.layout || 'columns') : 'columns';
+	function updateGridSpan(imageElement) {
+		if (!gridElement || layoutMode !== 'rows' || !imageElement) return;
+		const listItem = imageElement.closest('li');
+		if (!listItem) return;
+		const computedStyle = getComputedStyle(gridElement);
+		const rowHeight = parseFloat(computedStyle.getPropertyValue('grid-auto-rows')) || 8;
+		const gapY = parseFloat(computedStyle.getPropertyValue('grid-row-gap')) || parseFloat(computedStyle.getPropertyValue('grid-column-gap')) || 0;
+		const span = Math.max(1, Math.ceil((imageElement.getBoundingClientRect().height + gapY) / (rowHeight + gapY)));
+		listItem.style.gridRowEnd = `span ${span}`;
+	}
+	const refreshGridSpans = debounce(() => {
+		if (!gridElement || layoutMode !== 'rows') return;
+		gridElement.querySelectorAll('li img.visible').forEach(img => updateGridSpan(img));
+	}, 150);
 	function handleImage(imageElement) {
 		if (!imageElement) return;
 		const listItem = imageElement.closest('li');
 		imageElement.addEventListener('load', function() {
 			listItem.classList.add('loaded');
 			imageElement.classList.add('visible');
+			if (layoutMode === 'rows') {
+				updateGridSpan(imageElement);
+			}
 		});
 		imageElement.addEventListener('error', function() {
 			listItem.innerHTML = 'Failed to load image';
@@ -128,7 +167,13 @@
 		if (imageElement.complete) {
 			listItem.classList.add('loaded');
 			imageElement.classList.add('visible');
+			if (layoutMode === 'rows') {
+				updateGridSpan(imageElement);
+			}
 		}
+	}
+	if (gridElement && layoutMode === 'rows') {
+		window.addEventListener('resize', refreshGridSpans);
 	}
 	const observer = new IntersectionObserver((entries) => {
 		entries.forEach(entry => {
@@ -136,6 +181,9 @@
 				const img = entry.target;
 				handleImage(img);
 				observer.unobserve(img);
+				if (layoutMode === 'rows') {
+					refreshGridSpans();
+				}
 			}
 		});
 	}, {
@@ -146,7 +194,13 @@
 			observer.observe(img);
 		} else {
 			handleImage(img);
+			if (layoutMode === 'rows') {
+				refreshGridSpans();
+			}
 		}
 	});
+	if (gridElement && layoutMode === 'rows') {
+		refreshGridSpans();
+	}
 </script>
 {{ end }}
