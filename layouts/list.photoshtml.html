@@ -76,14 +76,14 @@
 		{{- end }}
 		{{- with $page.RawContent }}
 			{{- $raw := . -}}
-			{{- range $match := findRESubmatch $markdownPattern $raw }}
-				{{- $src := trim (index $match 1) " \r\n\t" -}}
+			{{- range $match := findRE $markdownPattern $raw }}
+				{{- $src := trim (replaceRE $markdownPattern `$1` $match) " \r\n\t" -}}
 				{{- if and $src (gt (len (findRE $imagePattern $src)) 0) (not (in ($scratch.Get "photos") $src)) }}
 					{{- $scratch.Add "photos" (slice $src) -}}
 				{{- end }}
 			{{- end }}
-			{{- range $match := findRESubmatch $htmlImgPattern $raw }}
-				{{- $src := trim (index $match 1) " \r\n\t" -}}
+			{{- range $match := findRE $htmlImgPattern $raw }}
+				{{- $src := trim (replaceRE $htmlImgPattern `$1` $match) " \r\n\t" -}}
 				{{- if and $src (gt (len (findRE $imagePattern $src)) 0) (not (in ($scratch.Get "photos") $src)) }}
 					{{- $scratch.Add "photos" (slice $src) -}}
 				{{- end }}
