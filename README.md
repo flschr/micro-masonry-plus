@@ -1,5 +1,4 @@
 # Micro.Masonry Plus
-
 ![](icon.png)
 
 **Micro.Masonry Plus** adds a responsive masonry-style gallery to your Micro.blog photos page.  
