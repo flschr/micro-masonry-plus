@@ -1,5 +1,5 @@
 # Micro.Masonry Plus
-![](icon.png)
+![](logo.png)
 
 **Micro.Masonry Plus** adds a responsive masonry-style gallery to your Micro.blog photos page.  
 This fork is maintained by [René Fischer](https://fischr.org) and is based on [jimmitchell/micro-masonry](https://github.com/jimmitchell/micro-masonry).
