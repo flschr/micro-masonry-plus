@@ -34,7 +34,8 @@
     {
       "field": "params.photos_show_all",
       "label": "Show all photos per post",
-      "placeholder": "true (default) or false"
+      "type": "boolean",
+      "default": true
     },
     {
       "field": "params.photos_layout_mode",

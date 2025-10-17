@@ -25,9 +25,9 @@
 .masonry-grid li {
     break-inside: avoid;
     margin-bottom: 1em;
-    background: #eee;
     overflow: hidden;
     position: relative;
+    background: transparent;
 }
 .masonry-grid--columns li {
     margin-bottom: 1em;
