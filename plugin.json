@@ -1,7 +1,7 @@
 {
-  "version": "2.0.0",
-  "title": "Micro.Masonry",
-  "description": "A Micro.blog plug-in to easily add a masonry style layout to your photos page.",
+  "version": "2.1.0",
+  "title": "Micro.Masonry Plus",
+  "description": "A Micro.blog plug-in to display your photos page in a configurable masonry-style layout.",
   "includes": [
 	"/css/micro-masonry.css"
   ],
@@ -10,6 +10,26 @@
       "field": "params.photos_category",
       "label": "Photos category",
       "placeholder": "Enter your photos category..."
+    },
+    {
+      "field": "params.photos_extensions",
+      "label": "Allowed photo extensions",
+      "placeholder": "e.g. jpg,jpeg,png,webp"
+    },
+    {
+      "field": "params.photos_columns_desktop",
+      "label": "Desktop column count",
+      "placeholder": "Default 4"
+    },
+    {
+      "field": "params.photos_columns_tablet",
+      "label": "Tablet column count",
+      "placeholder": "Default 3"
+    },
+    {
+      "field": "params.photos_columns_mobile",
+      "label": "Mobile column count",
+      "placeholder": "Default 2"
     }
   ]
 }

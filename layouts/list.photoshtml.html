@@ -1,22 +1,105 @@
 {{ define "main" }}
-	<ul class="masonry-grid">
-	{{- $list := where .Site.Pages ".Params.photos" "!=" nil -}}
+	{{- $columnsScratch := newScratch -}}
+	{{- $columnsScratch.Set "desktop" 4 -}}
+	{{- $columnsScratch.Set "tablet" 3 -}}
+		{{- $columnsScratch.Set "mobile" 2 -}}
+	{{- with .Site.Params.photos_columns_desktop }}
+		{{- $value := replaceRE `[^0-9]+` "" (printf "%v" .) -}}
+		{{- if ne $value "" }}
+			{{- $parsed := int $value -}}
+			{{- $columnsScratch.Set "desktop" (cond (lt $parsed 1) 1 (cond (gt $parsed 8) 8 $parsed)) -}}
+		{{- end }}
+	{{- end }}
+	{{- with .Site.Params.photos_columns_tablet }}
+		{{- $value := replaceRE `[^0-9]+` "" (printf "%v" .) -}}
+		{{- if ne $value "" }}
+			{{- $parsed := int $value -}}
+			{{- $columnsScratch.Set "tablet" (cond (lt $parsed 1) 1 (cond (gt $parsed 8) 8 $parsed)) -}}
+		{{- end }}
+	{{- end }}
+	{{- with .Site.Params.photos_columns_mobile }}
+		{{- $value := replaceRE `[^0-9]+` "" (printf "%v" .) -}}
+		{{- if ne $value "" }}
+			{{- $parsed := int $value -}}
+			{{- $columnsScratch.Set "mobile" (cond (lt $parsed 1) 1 (cond (gt $parsed 8) 8 $parsed)) -}}
+		{{- end }}
+	{{- end }}
+	<ul class="masonry-grid" style="--masonry-columns-desktop: {{ $columnsScratch.Get "desktop" }}; --masonry-columns-tablet: {{ $columnsScratch.Get "tablet" }}; --masonry-columns-mobile: {{ $columnsScratch.Get "mobile" }};">
+	{{- $list := .Site.RegularPages -}}
 	{{- $category := index .Site.Taxonomies.categories (lower .Site.Params.photos_category) -}}
 	{{- if $category }}
 		{{- $list = $category.Pages -}}
 	{{ end }}
-	{{- $len := (len $list) -}}
-	{{ range $index, $value := $list }}
-		{{- if .Params.photos -}}
-		<li>
-			<a href="{{ .Permalink }}">
-				{{ range first 1 .Params.photos }}
-					<img src="{{ . }}" loading="lazy" />
-				{{ end }}
-			</a>
-		</li>
-		{{- end -}}
-	{{- end -}}
+	{{- $defaultExtensions := slice "jpg" "jpeg" "png" "gif" "webp" "avif" "heic" "heif" "tiff" "bmp" -}}
+	{{- $configScratch := newScratch -}}
+	{{- $configScratch.Set "extensions" $defaultExtensions -}}
+	{{- with .Site.Params.photos_extensions }}
+		{{- $raw := printf "%v" . -}}
+		{{- $normalized := replaceRE `[;\s]+` $raw "," -}}
+		{{- $candidateScratch := newScratch -}}
+		{{- $candidateScratch.Set "list" (slice) -}}
+		{{- range split $normalized "," }}
+			{{- $ext := lower (replaceRE `[^a-z0-9]+` (trim . " .\r\n\t") "") -}}
+			{{- if and $ext (not (in ($candidateScratch.Get "list") $ext)) }}
+				{{- $candidateScratch.Add "list" (slice $ext) -}}
+			{{- end }}
+		{{- end }}
+		{{- if gt (len ($candidateScratch.Get "list")) 0 }}
+			{{- $configScratch.Set "extensions" ($candidateScratch.Get "list") -}}
+		{{- end }}
+	{{- end }}
+	{{- $extensions := $configScratch.Get "extensions" -}}
+	{{- $imagePattern := printf `(?i)\.(?:%s)(?:\?.*)?$` (delimit $extensions "|") -}}
+	{{- $markdownPattern := `!\[[^\]]*\]\(\s*([^)\s]+)(?:\s+["'][^"']*["'])?\s*\)` -}}
+	{{- $htmlImgPattern := `<img[^>]+src=["']([^"']+)["'][^>]*>` -}}
+	{{- range $page := $list }}
+		{{- $scratch := newScratch -}}
+		{{- $scratch.Set "photos" (slice) -}}
+		{{- with $page.Params.photos }}
+			{{- $photos := . -}}
+			{{- $type := printf "%T" $photos -}}
+			{{- if (hasPrefix $type "[]") }}
+				{{- range $photos }}
+					{{- $src := trim . " \r\n\t" -}}
+					{{- if and $src (not (in ($scratch.Get "photos") $src)) }}
+						{{- if gt (len (findRE $imagePattern $src)) 0 }}
+							{{- $scratch.Add "photos" (slice $src) -}}
+						{{- end }}
+					{{- end }}
+				{{- end }}
+			{{- else if (ne $photos "") }}
+				{{- $single := trim (printf "%v" $photos) " \r\n\t" -}}
+				{{- if gt (len (findRE $imagePattern $single)) 0 }}
+					{{- $scratch.Add "photos" (slice $single) -}}
+				{{- end }}
+			{{- end }}
+		{{- end }}
+		{{- with $page.RawContent }}
+			{{- $raw := . -}}
+			{{- range $match := findRESubmatch $markdownPattern $raw }}
+				{{- $src := trim (index $match 1) " \r\n\t" -}}
+				{{- if and $src (gt (len (findRE $imagePattern $src)) 0) (not (in ($scratch.Get "photos") $src)) }}
+					{{- $scratch.Add "photos" (slice $src) -}}
+				{{- end }}
+			{{- end }}
+			{{- range $match := findRESubmatch $htmlImgPattern $raw }}
+				{{- $src := trim (index $match 1) " \r\n\t" -}}
+				{{- if and $src (gt (len (findRE $imagePattern $src)) 0) (not (in ($scratch.Get "photos") $src)) }}
+					{{- $scratch.Add "photos" (slice $src) -}}
+				{{- end }}
+			{{- end }}
+		{{- end }}
+		{{- $photos := $scratch.Get "photos" -}}
+		{{- if gt (len $photos) 0 }}
+			{{- range $src := $photos }}
+				<li>
+					<a href="{{ $page.Permalink }}">
+						<img src="{{ $src | absURL | safeURL }}" loading="lazy" decoding="async" alt="{{ with $page.Title }}{{ . | plainify }}{{ else }}Photo{{ end }}" />
+					</a>
+				</li>
+			{{- end }}
+		{{- end }}
+	{{- end }}
 	</ul>
 <script>
 	function debounce(func, wait) {
