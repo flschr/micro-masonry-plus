@@ -34,7 +34,6 @@ All options are available in the Micro.blog plug-in settings panel:
 
 ## 🙏 Credits
 - [jimmitchell/micro-masonry](https://github.com/jimmitchell/micro-masonry) – original plug-in
-- Micro.blog community for inspiration and testing
 
 ## Changelog
 
