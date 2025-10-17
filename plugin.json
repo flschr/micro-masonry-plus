@@ -1,7 +1,7 @@
 {
   "version": "2.1.0",
   "title": "Micro.Masonry Plus",
-  "description": "A Micro.blog plug-in to display your photos page in a configurable masonry-style layout.",
+  "description": "A advanced Micro.blog plug-in to display your photos page in a configurable masonry-style layout.",
   "includes": [
 	"/css/micro-masonry.css"
   ],
