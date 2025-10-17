@@ -12,8 +12,6 @@ This fork is maintained by [René Fischer](https://fischr.org) and is based on [
 - Lightweight lazy loading with graceful loading and error states
 - Pure CSS/JS solution that respects your existing Micro.blog theme
 
-![](docs/example.jpg)
-
 ## 📦 Installation
 Install the plug-in from the **Micro.blog plug-in directory** or upload this repository as a custom plug-in. After installation, open the plug-in settings to configure it.
 
