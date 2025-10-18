@@ -197,6 +197,19 @@
 	}
 const gridElement = document.querySelector('.masonry-grid');
 const layoutMode = gridElement ? (gridElement.dataset.layout || 'columns') : 'columns';
+const mobileGridQuery = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(max-width: 600px)') : null;
+function isGridMasonryActive() {
+	if (!gridElement) return false;
+	if (layoutMode === 'rows') return true;
+	if (layoutMode === 'columns' && mobileGridQuery && mobileGridQuery.matches) return true;
+	return false;
+}
+function clearGridSpans() {
+	if (!gridElement) return;
+	gridElement.querySelectorAll('li').forEach(li => {
+		li.style.removeProperty('grid-row-end');
+	});
+}
 function scheduleLoadingState(listItem) {
 	if (!listItem || listItem.classList.contains('loaded')) return;
 	if (listItem._masonryLoadingTimer) return;
@@ -214,7 +227,7 @@ function clearLoadingState(listItem) {
 	listItem.classList.remove('loading');
 }
 function updateGridSpan(imageElement) {
-	if (!gridElement || (layoutMode !== 'rows' && layoutMode !== 'columns') || !imageElement) return;
+	if (!gridElement || !imageElement || !isGridMasonryActive()) return;
 	const listItem = imageElement.closest('li');
 	if (!listItem) return;
 	const computedStyle = getComputedStyle(gridElement);
@@ -224,7 +237,7 @@ function updateGridSpan(imageElement) {
 	listItem.style.gridRowEnd = `span ${span}`;
 }
 const refreshGridSpans = debounce(() => {
-	if (!gridElement || (layoutMode !== 'rows' && layoutMode !== 'columns')) return;
+	if (!gridElement || !isGridMasonryActive()) return;
 	gridElement.querySelectorAll('li img.visible').forEach(img => updateGridSpan(img));
 }, 150);
 function handleImage(imageElement) {
@@ -238,8 +251,10 @@ function handleImage(imageElement) {
 		clearLoadingState(listItem);
 		listItem.classList.add('loaded');
 		imageElement.classList.add('visible');
-		if (layoutMode === 'rows') {
+		if (isGridMasonryActive()) {
 			updateGridSpan(imageElement);
+		} else {
+			listItem.style.removeProperty('grid-row-end');
 		}
 	});
 	imageElement.addEventListener('error', function() {
@@ -252,13 +267,22 @@ function handleImage(imageElement) {
 		clearLoadingState(listItem);
 		listItem.classList.add('loaded');
 		imageElement.classList.add('visible');
-		if (layoutMode === 'rows') {
+		if (isGridMasonryActive()) {
 			updateGridSpan(imageElement);
+		} else if (listItem) {
+			listItem.style.removeProperty('grid-row-end');
 		}
 	}
 }
-if (gridElement && layoutMode === 'rows') {
-	window.addEventListener('resize', refreshGridSpans);
+if (gridElement) {
+	const handleResize = () => {
+		if (isGridMasonryActive()) {
+			refreshGridSpans();
+		} else {
+			clearGridSpans();
+		}
+	};
+	window.addEventListener('resize', handleResize);
 }
 const observer = new IntersectionObserver((entries) => {
 	entries.forEach(entry => {
@@ -266,7 +290,7 @@ const observer = new IntersectionObserver((entries) => {
 			const img = entry.target;
 			handleImage(img);
 			observer.unobserve(img);
-			if (layoutMode === 'rows') {
+			if (isGridMasonryActive()) {
 				refreshGridSpans();
 			}
 		}
@@ -282,13 +306,29 @@ document.querySelectorAll('.masonry-grid img').forEach(img => {
 		observer.observe(img);
 	} else {
 		handleImage(img);
-		if (layoutMode === 'rows') {
+		if (isGridMasonryActive()) {
 			refreshGridSpans();
 		}
 	}
 });
-if (gridElement && layoutMode === 'rows') {
+if (mobileGridQuery && layoutMode === 'columns') {
+	const handleMediaChange = () => {
+		if (isGridMasonryActive()) {
+			refreshGridSpans();
+		} else {
+			clearGridSpans();
+		}
+	};
+	if (typeof mobileGridQuery.addEventListener === 'function') {
+		mobileGridQuery.addEventListener('change', handleMediaChange);
+	} else if (typeof mobileGridQuery.addListener === 'function') {
+		mobileGridQuery.addListener(handleMediaChange);
+	}
+}
+if (gridElement && isGridMasonryActive()) {
 	refreshGridSpans();
+} else {
+	clearGridSpans();
 }
 </script>
 {{ end }}
